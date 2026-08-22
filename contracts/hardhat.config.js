@@ -8,6 +8,7 @@ require("dotenv").config();
  */
 const MONAD_TESTNET_RPC = process.env.MONAD_TESTNET_RPC || "https://testnet-rpc.monad.xyz";
 const MONAD_TESTNET_CHAIN_ID = 10143;
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -31,5 +32,20 @@ module.exports = {
     enabled: true,
     apiUrl: "https://sourcify-api-monad.blockvision.org/",
     browserUrl: "https://testnet.monadverifier.com/",
+  },
+  etherscan: {
+    // Etherscan v2 uses one key across supported chains; chain selection lives
+    // in the custom explorer API URL below.
+    apiKey: ETHERSCAN_API_KEY,
+    customChains: [
+      {
+        network: "monadTestnet",
+        chainId: MONAD_TESTNET_CHAIN_ID,
+        urls: {
+          apiURL: "https://api.etherscan.io/v2/api?chainid=10143",
+          browserURL: "https://testnet.monadscan.com",
+        },
+      },
+    ],
   },
 };

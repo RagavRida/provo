@@ -11,7 +11,7 @@ Provo is a verified GPU compute marketplace on Monad. It includes:
 ## Judge Links
 
 - Public repository: [github.com/RagavRida/provo](https://github.com/RagavRida/provo)
-- Monad Testnet contract: [`0xd599252a6F75b6dD1035d6DeB94985D30C396686`](https://testnet.monadscan.com/address/0xd599252a6F75b6dD1035d6DeB94985D30C396686)
+- Verified Monad Testnet contract: [`0xd599252a6F75b6dD1035d6DeB94985D30C396686`](https://testnet.monadscan.com/address/0xd599252a6F75b6dD1035d6DeB94985D30C396686)
 - Published contract source: [Monad Sourcify verification](https://testnet.monadverifier.com/contracts/full_match/10143/0xd599252a6F75b6dD1035d6DeB94985D30C396686/)
 - Live app: [web-alpha-coral-61.vercel.app](https://web-alpha-coral-61.vercel.app)
 
