@@ -1,6 +1,13 @@
+
+
 # Provo
 
-Provo is a verified GPU compute marketplace on Monad. It includes:
+Provo is a verified GPU compute marketplace where providers publish measurable
+performance, buyers choose based on evidence, and settlement is handled by a
+smart contract. The public demo is live at
+[web-alpha-coral-61.vercel.app](https://web-alpha-coral-61.vercel.app).
+
+It includes:
 
 - `contracts/` for the on-chain marketplace
 - `agent/` for benchmarking GPU providers
@@ -8,20 +15,19 @@ Provo is a verified GPU compute marketplace on Monad. It includes:
 - `web/` for the frontend
 - `buyer-agent/` for the autonomous on-chain buyer
 
-## Judge Links
+## Public Links
 
 - Public repository: [github.com/RagavRida/provo](https://github.com/RagavRida/provo)
 - Verified Monad Testnet contract: [`0xd599252a6F75b6dD1035d6DeB94985D30C396686`](https://testnet.monadscan.com/address/0xd599252a6F75b6dD1035d6DeB94985D30C396686)
 - Published contract source: [Monad Sourcify verification](https://testnet.monadverifier.com/contracts/full_match/10143/0xd599252a6F75b6dD1035d6DeB94985D30C396686/)
-- Live app: [web-alpha-coral-61.vercel.app](https://web-alpha-coral-61.vercel.app)
-
-During the pitch, say the repository URL, the contract address, the live app URL, and that Provo is deployed on Monad Testnet.
+- Live website: [provo-marketplace.vercel.app](https://provo-marketplace.vercel.app)
+- Agent Backend: [provo.onrender.com](https://provo.onrender.com)
 
 ## What you need
 
 - Node.js 18 or newer
 - `npm`
-- A Monad testnet wallet and RPC access if you want to deploy or use the live flow
+- A compatible testnet wallet and RPC access if you want to deploy or use the live flow
 
 ## Project Layout
 
@@ -49,7 +55,7 @@ npm test
 npm run compile
 ```
 
-Deploy to Monad testnet:
+Deploy to the configured testnet:
 
 ```bash
 npm run deploy:testnet
