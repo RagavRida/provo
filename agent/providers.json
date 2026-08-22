@@ -1,0 +1,34 @@
+{
+  "prompt": "Explain, in exactly three sentences, why parallelism is hard to get right in distributed systems.",
+  "maxTokens": 256,
+  "runsPerProvider": 3,
+  "providers": [
+    {
+      "id": "alpha-cloud",
+      "label": "AlphaCloud H100",
+      "gpuModel": "H100",
+      "pricePerHour": 1.5,
+      "baseUrl": "https://api.alphacloud.example/v1",
+      "model": "llama-3.1-70b",
+      "apiKeyEnv": "ALPHA_CLOUD_API_KEY"
+    },
+    {
+      "id": "beta-compute",
+      "label": "BetaCompute H100",
+      "gpuModel": "H100",
+      "pricePerHour": 1.8,
+      "baseUrl": "https://api.betacompute.example/v1",
+      "model": "llama-3.1-70b",
+      "apiKeyEnv": "BETA_COMPUTE_API_KEY"
+    },
+    {
+      "id": "gamma-gpu",
+      "label": "GammaGPU H100",
+      "gpuModel": "H100",
+      "pricePerHour": 2.1,
+      "baseUrl": "https://api.gammagpu.example/v1",
+      "model": "llama-3.1-70b",
+      "apiKeyEnv": "GAMMA_GPU_API_KEY"
+    }
+  ]
+}

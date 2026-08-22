@@ -1,0 +1,15 @@
+{
+  "name": "provo-benchmark-agent",
+  "version": "1.0.0",
+  "description": "Provo benchmark agent — runs an identical prompt against GPU provider endpoints and computes effective cost per million tokens",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "mock": "node index.js --mock"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=18"
+  }
+}
