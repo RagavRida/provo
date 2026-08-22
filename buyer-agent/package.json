@@ -1,0 +1,18 @@
+{
+  "name": "provo-buyer-agent",
+  "version": "1.0.0",
+  "description": "Autonomous on-chain buyer agent for Provo — scores listings, funds jobs, watches settlement, and auto-reroutes on failure within a hard spending cap",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --env-file=.env index.js",
+    "serve": "node --env-file=.env index.js --serve --min-tok-s 90 --max-spend 0.05",
+    "test": "node scoring.test.js"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
