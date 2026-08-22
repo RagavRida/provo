@@ -1,0 +1,9 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "node index.js --serve --min-tok-s 90 --max-spend 0.05 --latency-sensitive --min-vram 40 --prefer-region us-east"
+healthcheckPath = "/status"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: provo-agent
+    runtime: node
+    rootDir: buyer-agent
+    buildCommand: npm ci --omit=dev
+    startCommand: node index.js --serve --min-tok-s 90 --max-spend 0.05 --latency-sensitive --min-vram 40 --prefer-region us-east
+    envVars:
+      - key: RPC_URL
+        value: https://testnet-rpc.monad.xyz
+      - key: CONTRACT_ADDRESS
+        value: 0xd599252a6F75b6dD1035d6DeB94985D30C396686
+      - key: AGENT_PRIVATE_KEY
+        sync: false  # set manually in dashboard
+      - key: AGENT_PORT
+        value: "3001"
+      - key: PORT
+        value: "3001"
+    healthCheckPath: /status
+
+  - type: worker
+    name: provo-oracle
+    runtime: node
+    rootDir: oracle
+    buildCommand: npm ci --omit=dev
+    startCommand: node watch.js
+    envVars:
+      - key: RPC_URL
+        value: https://testnet-rpc.monad.xyz
+      - key: CONTRACT_ADDRESS
+        value: 0xd599252a6F75b6dD1035d6DeB94985D30C396686
+      - key: ORACLE_PRIVATE_KEY
+        sync: false  # set manually in dashboard

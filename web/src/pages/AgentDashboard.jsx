@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const AGENT_URL = "http://localhost:3001";
+const AGENT_URL = import.meta.env.VITE_AGENT_URL || "http://localhost:3001";
 const EXPLORER_TX = "https://testnet.monadscan.com/tx/";
 
 const STATUS_LABELS = {
