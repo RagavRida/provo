@@ -1,0 +1,16 @@
+{
+  "name": "provo-oracle-bridge",
+  "version": "1.0.0",
+  "description": "Provo oracle bridge — takes benchmark agent output and calls submitVerification on the deployed ProvoMarketplace contract",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "submit": "node index.js"
+  },
+  "dependencies": {
+    "viem": "^2.21.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "1": { "url": "http://localhost:8000", "note": "Provider 1 — H100 us-east" },
+  "2": { "url": "http://localhost:8001", "note": "Provider 2 — H100 eu-west" },
+  "3": { "url": "http://localhost:8002", "note": "Provider 3 — A100 us-east" }
+}
