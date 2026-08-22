@@ -5,7 +5,7 @@
 Provo is a verified GPU compute marketplace where providers publish measurable
 performance, buyers choose based on evidence, and settlement is handled by a
 smart contract. The public demo is live at
-[web-alpha-coral-61.vercel.app](https://web-alpha-coral-61.vercel.app).
+[provo-marketplace.vercel.app](https://provo-marketplace.vercel.app).
 
 It includes:
 
