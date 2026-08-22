@@ -1,6 +1,7 @@
 import { ethers } from "ethers";
 import { MARKETPLACE_ABI } from "./abi.js";
 import { rankEligibleListings, stakeConfidenceBps, TOK_SCALE, BPS, NEUTRAL_PRIOR_BPS } from "./scoring.js";
+import { analyzeWithAI } from "./ai.js";
 
 const fmtMon = (wei) => `${ethers.formatEther(wei)} MON`;
 const fmtTok = (scaled) => (Number(scaled) / 1e6).toFixed(1);
@@ -404,6 +405,28 @@ export class BuyerAgent {
       } catch (err) {
         return this.finalReport("error", `Could not read listings: ${err.shortMessage || err.message}`);
       }
+
+      // ---- AI REASONING LAYER ----
+      // GPT-4 analyzes the listings and explains its recommendation.
+      // This runs in parallel with (before) deterministic scoring — the AI
+      // provides narrative reasoning while the formula provides the final pick.
+      try {
+        const aiListings = entries.map((e) => ({
+          id: e.id,
+          ...e.listing,
+          reputationBps: e.reputationBps,
+        }));
+        await analyzeWithAI(aiListings, {
+          minTokPerSec: fmtTok(this.workload.minTokPerSec),
+          maxTotalSpendWei: this.maxTotalSpendWei.toString(),
+          preferRegion: this.workload.preferRegion,
+          minVramGb: this.workload.minVramGb?.toString(),
+          latencySensitive: this.workload.latencySensitive,
+        }, this.broadcast.bind(this));
+      } catch (err) {
+        this.log.log(`[AI] Analysis failed (non-fatal): ${err.message}`);
+      }
+      // ---- END AI LAYER ----
 
       const candidate = this.selectBest(entries);
       if (!candidate) {

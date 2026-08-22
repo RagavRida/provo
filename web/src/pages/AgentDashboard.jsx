@@ -88,6 +88,64 @@ function EventCard({ event }) {
     );
   }
 
+  if (type === "ai_thinking") {
+    return (
+      <div className={`${baseClass} border-violet-400/40 bg-violet-400/5 animate-pulse`}>
+        <div className="flex items-center gap-2 text-sm font-semibold text-violet-400">
+          <span className="text-lg">🧠</span> AI Analyzing…
+          <span className="ml-auto text-xs text-provo-muted">{time}</span>
+        </div>
+        <p className="mt-1 text-xs text-provo-muted">{data.message}</p>
+      </div>
+    );
+  }
+
+  if (type === "ai_analysis") {
+    return (
+      <div className={`${baseClass} border-violet-400/40 bg-violet-400/5`}>
+        <div className="flex items-center gap-2 text-sm font-semibold text-violet-400">
+          <span className="text-lg">🧠</span> AI Reasoning (GPT-4)
+          <span className="ml-auto text-xs text-provo-muted">{time}</span>
+        </div>
+        <p className="mt-2 text-sm text-provo-text italic">"{data.reasoning}"</p>
+        {data.recommendation && (
+          <div className="mt-3 rounded-lg border border-violet-400/20 bg-violet-400/5 px-3 py-2">
+            <p className="text-xs font-semibold text-violet-300">
+              Recommends Listing #{data.recommendation.listingId}
+              <span className={`ml-2 rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                data.recommendation.confidence === "high" ? "bg-provo-pass/20 text-provo-pass" :
+                data.recommendation.confidence === "medium" ? "bg-amber-400/20 text-amber-400" :
+                "bg-provo-fail/20 text-provo-fail"
+              }`}>{data.recommendation.confidence} confidence</span>
+            </p>
+            <p className="mt-1 text-xs text-provo-muted">{data.recommendation.explanation}</p>
+          </div>
+        )}
+        {data.risks?.length > 0 && (
+          <div className="mt-2 space-y-1">
+            {data.risks.map((risk, i) => (
+              <p key={i} className="text-xs text-amber-400">⚠ {risk}</p>
+            ))}
+          </div>
+        )}
+        {data.tokensUsed > 0 && (
+          <p className="mt-2 text-[10px] text-provo-muted">{data.tokensUsed} tokens used</p>
+        )}
+      </div>
+    );
+  }
+
+  if (type === "ai_error" || type === "ai_skip") {
+    return (
+      <div className={`${baseClass} border-provo-border bg-provo-surface/30`}>
+        <div className="flex items-center gap-2 text-sm text-provo-muted">
+          <span className="text-lg">🧠</span> {type === "ai_skip" ? "AI skipped — using deterministic scoring" : `AI error: ${data.error}`}
+          <span className="ml-auto text-xs">{time}</span>
+        </div>
+      </div>
+    );
+  }
+
   if (type === "score") {
     return (
       <div className={`${baseClass} border-blue-400/30 bg-blue-400/5`}>
