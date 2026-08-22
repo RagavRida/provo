@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build output
+web/dist/
+contracts/artifacts/
+contracts/cache/
+
+# Environment files (contain private keys!)
+.env
+*/.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log
+
+# Gemini agent data
+.gemini/
+.agents/
