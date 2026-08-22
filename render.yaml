@@ -1,5 +1,17 @@
 services:
   - type: web
+    name: provo-web
+    runtime: static
+    rootDir: web
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_CONTRACT_ADDRESS
+        value: 0xd599252a6F75b6dD1035d6DeB94985D30C396686
+      - key: VITE_MONAD_TESTNET_RPC
+        value: https://testnet-rpc.monad.xyz
+
+  - type: web
     name: provo-agent
     runtime: node
     rootDir: buyer-agent

@@ -1,6 +1,7 @@
-// Deployed ProvoMarketplace contract address + ABI + chain config.
-// Fill CONTRACT_ADDRESS after running `npm run deploy:testnet` in /contracts.
-export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000000000";
+// Monad testnet marketplace used by the public demo. A deployment can override
+// this with VITE_CONTRACT_ADDRESS without leaving a hosted app unconfigured.
+export const CONTRACT_ADDRESS =
+  import.meta.env.VITE_CONTRACT_ADDRESS || "0xd599252a6F75b6dD1035d6DeB94985D30C396686";
 
 // Confirm chainId/RPC against https://docs.monad.xyz before demoing — testnet
 // endpoints rotate.

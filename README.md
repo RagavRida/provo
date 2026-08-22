@@ -1,126 +1,155 @@
 # Provo
 
-**A GPU costs what it delivers, not what it claims.**
+Provo is a verified GPU compute marketplace on Monad. It includes:
 
-A verified GPU compute marketplace on Monad. Providers stake MON behind a performance claim; a benchmark agent measures real delivered throughput; an oracle submits the result on-chain; a smart contract auto-settles — pay the provider on a pass, refund the buyer plus a proportional slash of the provider's stake on a fail.
+- `contracts/` for the on-chain marketplace
+- `agent/` for benchmarking GPU providers
+- `oracle/` for submitting benchmark results on-chain
+- `web/` for the frontend
+- `buyer-agent/` for the autonomous on-chain buyer
 
-Mechanism: **claim → stake → escrow → execute → verify → settle.**
+## Judge Links
 
-## Structure
+- Public repository: [github.com/RagavRida/provo](https://github.com/RagavRida/provo)
+- Monad Testnet contract: [`0xd599252a6F75b6dD1035d6DeB94985D30C396686`](https://testnet.monadscan.com/address/0xd599252a6F75b6dD1035d6DeB94985D30C396686)
+- Published contract source: [Monad Sourcify verification](https://testnet.monadverifier.com/contracts/full_match/10143/0xd599252a6F75b6dD1035d6DeB94985D30C396686/)
+- Live app: [web-alpha-coral-61.vercel.app](https://web-alpha-coral-61.vercel.app)
 
-| Folder | Phase | What it is |
-|---|---|---|
-| `contracts/` | 1 | `ProvoMarketplace.sol` (Solidity 0.8.24, Hardhat), 9 passing tests |
-| `agent/` | 2 | Node.js benchmark agent — measures tok/s + reliability across providers, outputs an effective-cost comparison table and the oracle payload |
-| `oracle/` | 3 | Minimal single-signer bridge — calls `submitVerification` on-chain with the agent's measured numbers |
-| `web/` | 4 | React + Vite + Tailwind + viem frontend — marketplace, buyer flow, provider flow |
+During the pitch, say the repository URL, the contract address, the live app URL, and that Provo is deployed on Monad Testnet.
 
-## Quickstart
+## What you need
 
-### 1. Deploy the contract (testnet)
+- Node.js 18 or newer
+- `npm`
+- A Monad testnet wallet and RPC access if you want to deploy or use the live flow
 
-Two ways to deploy — pick one:
+## Project Layout
 
-**Option A — Alchemy Agent Wallet + CREATE2 via CreateX (recommended, no raw private key)**
+| Folder | Purpose |
+|---|---|
+| `contracts/` | Solidity marketplace contract, tests, and deploy scripts |
+| `agent/` | Benchmark agent that compares provider performance and cost |
+| `oracle/` | Bridge that submits benchmark results to the contract |
+| `web/` | React frontend for marketplace, provider, and buyer flows |
+| `buyer-agent/` | Autonomous buyer that funds jobs and reroutes on failure |
 
-Matches the `monad-wallet` skill: your key stays in Alchemy's enclave, an agent only ever holds a revocable session token.
+## Quick Start
 
-```bash
-cd contracts
-npm install
-npm test                                    # 9 tests should pass
-npx hardhat compile
-node scripts/create2Deploy.js --oracle 0xYourOracleAddress --network testnet
-```
+If you want the full testnet setup, start with [TESTNET.md](./TESTNET.md).
 
-This predicts the deployment address and prints the exact `alchemy evm contract call ... deployCreate2(...)` command. You (not the agent) then run, once:
+If you only want to run the pieces locally, use the sections below.
 
-```bash
-npm install -g @alchemy/cli@latest
-alchemy auth                     # or: alchemy auth login --device-code (headless)
-# create an EVM Agent Wallet session at https://dashboard.alchemy.com/products/agent-wallet/evm-wallet
-alchemy wallet connect --mode session
-alchemy wallet use session
-alchemy config set network monad-testnet
-```
+## 1. Contracts
 
-then paste the printed `alchemy evm contract call` command to actually deploy.
-
-**Option B — plain Hardhat deploy with a raw private key**
+From `contracts/`:
 
 ```bash
-cd contracts
-cp .env.example .env   # fill in DEPLOYER_PRIVATE_KEY and ORACLE_ADDRESS
 npm install
 npm test
-npm run deploy:testnet          # confirm RPC/chainId against docs.monad.xyz first
+npm run compile
 ```
 
-Only use a throwaway testnet key here, never your main wallet's key.
-
-Either way, verify the deployed contract via the verification API (see the `monad-scaffold` skill) so it shows up cleanly on the explorer for the demo.
-
-### 2. Run the benchmark agent
+Deploy to Monad testnet:
 
 ```bash
-cd agent
-npm run mock     # simulated, clearly labeled — no live provider accounts needed
-# or, with real provider API keys set as env vars matching providers.json:
-npm start
+npm run deploy:testnet
 ```
 
-Prints a comparison table sorted by *effective* cost per million tokens, plus the exact JSON payload for `submitVerification`.
+Set `ORACLE_ADDRESS` before deploying. After deployment, use the printed contract address in the other apps.
 
-### 3. Submit a verification via the oracle bridge
+## 2. Benchmark Agent
+
+From `agent/`:
 
 ```bash
-cd oracle
-cp .env.example .env   # fill in ORACLE_PRIVATE_KEY (must match the contract's oracle address) and CONTRACT_ADDRESS
 npm install
-node index.js --jobId <id> --tokPerSec <scaled> --latencyMs <ms> --successBps <bps>
+npm run mock
 ```
 
-### 4. Run the frontend
+Use `npm start` for live provider checks.
+
+Environment variables are provider-specific and listed in `providers.json`. Each provider needs its own API key in the environment.
+
+The agent prints:
+
+- measured throughput and latency
+- success rate
+- effective cost per million tokens
+- the oracle payload to submit on-chain
+
+## 3. Oracle Bridge
+
+From `oracle/`:
 
 ```bash
-cd web
-cp .env.example .env   # fill in VITE_CONTRACT_ADDRESS after deploying
+npm install
+node index.js --payload ./payload.json
+```
+
+You can also pass the values directly:
+
+```bash
+node index.js --jobId 3 --tokPerSec 90650000 --latencyMs 793 --successBps 6667
+```
+
+Required environment variables:
+
+- `ORACLE_PRIVATE_KEY`
+- `CONTRACT_ADDRESS`
+- optional `MONAD_TESTNET_RPC`
+
+## 4. Web App
+
+From `web/`:
+
+```bash
 npm install
 npm run dev
 ```
 
-MetaMask works unmodified since Monad is EVM-compatible — the app will prompt to add/switch to Monad testnet on connect.
+Set `VITE_CONTRACT_ADDRESS` to the deployed marketplace address.
 
-## Demo script (3 min)
+The checked-in default is the public Monad Testnet demo contract, so the app
+also opens against a live marketplace without a local `.env`. The current
+public deployment is hosted on Vercel. `render.yaml` also includes a
+`provo-web` static service if you prefer deploying a Render Blueprint.
 
-1. "Is an H100 really an H100?" — show 3 listings at different prices for the same GPU model.
-2. Cite the ~34.5% real-world performance variation among "identical" H100s.
-3. Run `npm run mock` in `agent/` live — show the advertised-cheapest listing diverge from the actually-cheapest-by-effective-cost listing.
-4. `fundJob` → `submitVerification` live on Monad testnet — show the explorer transaction and the automatic payout or slash.
-5. Close: "A GPU costs what it delivers, not what it claims."
+## 5. Buyer Agent
 
-## Hackathon scope / cut for time
-
-- Single trusted oracle address (owner-settable), no dispute window, no decentralized oracle network — see `ProvoMarketplace.sol` comments for the v2 roadmap.
-- One workload type benchmarked (not multi-workload).
-- One logo, one palette, one type pairing — no lockups, motion, or templates.
-
-## Autonomous buyer agent
-
-`buyer-agent/` contains a fully autonomous on-chain buyer: fund its wallet once, hand it a workload spec, and it selects a provider, pays, watches settlement, and auto-reroutes to the next best provider if the first one underdelivers — all within a hard, non-overridable spending cap. See `buyer-agent/README.md`.
+From `buyer-agent/`:
 
 ```bash
-cd buyer-agent && npm install && npm test     # 12 scoring/eligibility unit tests
-
-# end-to-end on a local chain (needs `npx hardhat node` running in contracts/)
-cd contracts
-npx hardhat run scripts/localDemo.js     --network localhost   # fail → auto-reroute → pass
-npx hardhat run scripts/guardrailTest.js --network localhost   # spend-cap enforcement
+npm install
+npm test
 ```
 
-## Deploying to Monad testnet
+To run it against a deployed contract:
 
-See **[TESTNET.md](./TESTNET.md)** for the full runbook: wallet setup and funding
-amounts, deployment (Hardhat or Alchemy Agent Wallet + CREATE2), seeding the demo
-listings, running the auto-settling oracle watcher, and driving the autonomous
-buyer agent end-to-end — plus a demo-day checklist and troubleshooting table.
+```bash
+node index.js --min-tok-s 90 --hours 1 --max-retries 2 --max-spend 0.05
+```
+
+Required environment variables:
+
+- `CONTRACT_ADDRESS`
+- `AGENT_PRIVATE_KEY`
+
+## Typical Workflow
+
+1. Deploy the contract from `contracts/`.
+2. Copy the deployed address into `oracle/`, `web/`, and any agent config that needs it.
+3. Run the benchmark agent in `agent/` to measure providers.
+4. Submit the selected benchmark payload through `oracle/`.
+5. Open the frontend in `web/` to view and use the marketplace.
+6. Optionally run `buyer-agent/` to automate buyer selection and settlement handling.
+
+## Testing
+
+- `contracts/`: `npm test`
+- `agent/`: `npm run mock`
+- `buyer-agent/`: `npm test`
+
+## Additional Notes
+
+- `TESTNET.md` has the full Monad testnet runbook.
+- `buyer-agent/README.md` has the autonomous buyer setup in more detail.

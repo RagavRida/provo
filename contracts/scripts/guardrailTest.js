@@ -24,8 +24,8 @@ async function deployScenario() {
   const market = await Factory.deploy(oracle.address);
   await market.waitForDeployment();
 
-  await (await market.connect(providerA).createListing("H100", TOK(100), ETH("0.010"), { value: ETH("1.0") })).wait();
-  await (await market.connect(providerB).createListing("H100", TOK(95), ETH("0.014"), { value: ETH("1.0") })).wait();
+  await (await market.connect(providerA).createListing("H100", 80, "us-east", TOK(100), ETH("0.010"), { value: ETH("1.0") })).wait();
+  await (await market.connect(providerB).createListing("H100", 80, "eu-west", TOK(95), ETH("0.014"), { value: ETH("1.0") })).wait();
 
   const agentWallet = new hre.ethers.Wallet(AGENT_PRIVATE_KEY, hre.ethers.provider);
   await (await deployer.sendTransaction({ to: agentWallet.address, value: ETH("1.0") })).wait();

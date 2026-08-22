@@ -41,11 +41,11 @@ async function main() {
   //  #2 solid: slightly pricier per hour, actually delivers.
   //  #3 too slow: filtered out by the workload's minimum throughput.
   console.log("\nSeeding listings…");
-  await (await market.connect(providerA).createListing("H100", TOK(100), ETH("0.010"), { value: ETH("1.0") })).wait();
+  await (await market.connect(providerA).createListing("H100", 80, "us-east", TOK(100), ETH("0.010"), { value: ETH("1.0") })).wait();
   console.log("  #1 H100  claims 100.0 tok/s @ 0.010 MON/hr  (stake 1.0 MON)  <- headline-best");
-  await (await market.connect(providerB).createListing("H100", TOK(95), ETH("0.014"), { value: ETH("1.0") })).wait();
+  await (await market.connect(providerB).createListing("H100", 80, "eu-west", TOK(95), ETH("0.014"), { value: ETH("1.0") })).wait();
   console.log("  #2 H100  claims  95.0 tok/s @ 0.014 MON/hr  (stake 1.0 MON)  <- honest");
-  await (await market.connect(providerC).createListing("A100", TOK(60), ETH("0.009"), { value: ETH("1.0") })).wait();
+  await (await market.connect(providerC).createListing("A100", 40, "us-east", TOK(60), ETH("0.009"), { value: ETH("1.0") })).wait();
   console.log("  #3 A100  claims  60.0 tok/s @ 0.009 MON/hr  (stake 1.0 MON)  <- below workload minimum");
 
   // Fund the agent's wallet once — this is the only human action in the demo.

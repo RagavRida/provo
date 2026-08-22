@@ -6,6 +6,8 @@ describe("ProvoMarketplace", function () {
   let owner, oracle, provider, buyer;
 
   const CLAIMED_TOK_PER_SEC = 95_000_000n; // 95.0 tok/s scaled by 1e6
+  const VRAM_GB = 80;
+  const REGION = "us-east";
   const PRICE_PER_HOUR = ethers.parseEther("0.01");
   const STAKE = ethers.parseEther("1.0");
   const ESCROW = ethers.parseEther("0.02");
@@ -17,21 +19,28 @@ describe("ProvoMarketplace", function () {
     await marketplace.waitForDeployment();
   });
 
+  async function createDefaultListing(stake = STAKE) {
+    return marketplace
+      .connect(provider)
+      .createListing("H100", VRAM_GB, REGION, CLAIMED_TOK_PER_SEC, PRICE_PER_HOUR, { value: stake });
+  }
+
   it("creates a listing and stakes MON", async function () {
-    await expect(
-      marketplace.connect(provider).createListing("H100", CLAIMED_TOK_PER_SEC, PRICE_PER_HOUR, { value: STAKE })
-    )
+    await expect(createDefaultListing())
       .to.emit(marketplace, "ListingCreated")
-      .withArgs(1, provider.address, "H100", CLAIMED_TOK_PER_SEC, PRICE_PER_HOUR, STAKE);
+      .withArgs(1, provider.address, "H100", VRAM_GB, REGION, CLAIMED_TOK_PER_SEC, PRICE_PER_HOUR, STAKE);
 
     const listing = await marketplace.getListing(1);
     expect(listing.provider).to.equal(provider.address);
+    expect(listing.gpuModel).to.equal("H100");
+    expect(listing.vramGb).to.equal(VRAM_GB);
+    expect(listing.region).to.equal(REGION);
     expect(listing.stake).to.equal(STAKE);
     expect(listing.active).to.equal(true);
   });
 
   it("funds a job into escrow", async function () {
-    await marketplace.connect(provider).createListing("H100", CLAIMED_TOK_PER_SEC, PRICE_PER_HOUR, { value: STAKE });
+    await createDefaultListing();
 
     await expect(marketplace.connect(buyer).fundJob(1, { value: ESCROW }))
       .to.emit(marketplace, "JobFunded")
@@ -43,7 +52,7 @@ describe("ProvoMarketplace", function () {
   });
 
   it("settles a passing job: provider gets paid, reputation updates", async function () {
-    await marketplace.connect(provider).createListing("H100", CLAIMED_TOK_PER_SEC, PRICE_PER_HOUR, { value: STAKE });
+    await createDefaultListing();
     await marketplace.connect(buyer).fundJob(1, { value: ESCROW });
 
     const measured = 96_000_000n; // above 95% tolerance of claim
@@ -63,7 +72,7 @@ describe("ProvoMarketplace", function () {
   });
 
   it("settles a failing job: buyer refunded + proportional slash of stake", async function () {
-    await marketplace.connect(provider).createListing("H100", CLAIMED_TOK_PER_SEC, PRICE_PER_HOUR, { value: STAKE });
+    await createDefaultListing();
     await marketplace.connect(buyer).fundJob(1, { value: ESCROW });
 
     // Measured 76 tok/s vs claimed 95 -> delivered ~80%, shortfall ~20% (2000 bps)
@@ -97,7 +106,7 @@ describe("ProvoMarketplace", function () {
 
   it("caps slash at remaining stake", async function () {
     const smallStake = ethers.parseEther("0.001");
-    await marketplace.connect(provider).createListing("H100", CLAIMED_TOK_PER_SEC, PRICE_PER_HOUR, { value: smallStake });
+    await createDefaultListing(smallStake);
     await marketplace.connect(buyer).fundJob(1, { value: ESCROW });
 
     // Complete failure (0 measured tok/s) would compute a slash larger than stake
@@ -108,14 +117,14 @@ describe("ProvoMarketplace", function () {
   });
 
   it("rejects withdrawListing while a job is pending", async function () {
-    await marketplace.connect(provider).createListing("H100", CLAIMED_TOK_PER_SEC, PRICE_PER_HOUR, { value: STAKE });
+    await createDefaultListing();
     await marketplace.connect(buyer).fundJob(1, { value: ESCROW });
 
     await expect(marketplace.connect(provider).withdrawListing(1)).to.be.revertedWith("Provo: jobs pending");
   });
 
   it("allows withdrawListing once no jobs are pending", async function () {
-    await marketplace.connect(provider).createListing("H100", CLAIMED_TOK_PER_SEC, PRICE_PER_HOUR, { value: STAKE });
+    await createDefaultListing();
     await marketplace.connect(buyer).fundJob(1, { value: ESCROW });
     await marketplace.connect(oracle).submitVerification(1, 96_000_000n, 250, 10000);
 
@@ -125,7 +134,7 @@ describe("ProvoMarketplace", function () {
   });
 
   it("rejects submitVerification from a non-oracle address", async function () {
-    await marketplace.connect(provider).createListing("H100", CLAIMED_TOK_PER_SEC, PRICE_PER_HOUR, { value: STAKE });
+    await createDefaultListing();
     await marketplace.connect(buyer).fundJob(1, { value: ESCROW });
 
     await expect(
